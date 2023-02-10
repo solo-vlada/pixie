@@ -37,6 +37,7 @@ const UpdateParam = (option: SchemeType) => {
 
 // custom hook to render correct options in the selectors
 //TODO: fix the Link - add it as a component to MenuItem to fix the width of clickable area
+// Currently the Link work only if clicked on text 
 const useOptions = (
   label: string | undefined,
   data: string[] | SchemeType[],
@@ -72,7 +73,7 @@ const useOptions = (
 
     //checks if options are public or cental by unique key
     //adds Central or Public subheader accordingly
-    //TODO - create a separate function for this to avoid repettive code?
+    //TODO - create a separate function for this to avoid repetative code?
     const centralOptions = options.filter(
       (option: JSX.Element, key: number) => option.key === key + "central"
     );
