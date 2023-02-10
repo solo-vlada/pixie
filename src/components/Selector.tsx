@@ -1,13 +1,16 @@
-import * as React from "react";
+//MUI components
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ListSubheader from "@mui/material/ListSubheader";
+
+//React
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+//Types
 type DataProps = {
   data: string[] | SchemeType[];
   label?: string;
@@ -32,7 +35,8 @@ const UpdateParam = (option: SchemeType) => {
   return { param };
 };
 
-// custom hook to render correct option to the selectors
+// custom hook to render correct options in the selectors
+//TODO: fix the Link - add it as a component to MenuItem to fix the width of clickable area
 const useOptions = (
   label: string | undefined,
   data: string[] | SchemeType[],
@@ -41,7 +45,7 @@ const useOptions = (
   if (label !== "Schemes") {
     const options = (data as string[]).map((option: string, key: number) => {
       return (
-        <MenuItem key={key} value={option}>
+        <MenuItem key={option} value={option}>
           <Link to={`${urlParam}${option}`}>{option}</Link>
         </MenuItem>
       );
@@ -50,12 +54,12 @@ const useOptions = (
   } else {
     const options = (data as SchemeType[]).map(
       (option: SchemeType, key: number) => {
-        //toggle between public or central param
+        //toggles between public or central param in the url
         const { param } = UpdateParam(option);
 
         return (
           <MenuItem
-            key={Object.keys(option)[0]}
+            key={key + Object.keys(option)[0]}
             value={Object.values(option)[0]}
           >
             <Link to={`${urlParam}${param}/${Object.values(option)}`}>
@@ -66,14 +70,15 @@ const useOptions = (
       }
     );
 
-    //add Central or Public subheader
+    //checks if options are public or cental by unique key
+    //adds Central or Public subheader accordingly
+    //TODO - create a separate function for this to avoid repettive code?
     const centralOptions = options.filter(
-      (option: JSX.Element) => option.key === "central"
+      (option: JSX.Element, key: number) => option.key === key + "central"
     );
     const publicOptions = options.filter(
-      (option: JSX.Element) => option.key === "public"
+      (option: JSX.Element, key: number) => option.key === key + "public"
     );
-    console.log(publicOptions);
     return [
       <ListSubheader>Central Schemes</ListSubheader>,
       ...centralOptions,
@@ -91,51 +96,10 @@ export default function Selector({ data, label, urlParam, param }: DataProps) {
     setValue(event.target.value);
   };
 
-  //update selector on url param change
-  React.useEffect(() => {
+  //updates selector on url param change
+  useEffect(() => {
     setValue(param);
   }, [param]);
-
-  // const renderCentralOptions = (data: SchemeType[]) => {
-  //   const centralOptions = data.map((option: SchemeType, key: number) => {
-  //     if (Object.hasOwn(option, "central")) {
-  //       return (
-  //         <MenuItem key={key} value={option.central}>
-  //           <Link to={`${urlParam}central/${option.central}`}>
-  //             {option.central}
-  //           </Link>
-  //         </MenuItem>
-  //       );
-  //     }
-  //   });
-  //   return [<ListSubheader>Central Scheme</ListSubheader>, ...centralOptions];
-  // };
-
-  // const renderPublicOptions = (data: SchemeType[]) => {
-  //   const publicOptions = data?.map((option: SchemeType, key: number) => {
-  //     if (Object.hasOwn(option, "public")) {
-  //       return (
-  //         <MenuItem key={key} value={option.public}>
-  //           <Link to={`${urlParam}public/${option.public}`}>
-  //             {option.public}
-  //           </Link>
-  //         </MenuItem>
-  //       );
-  //     }
-  //   });
-  //   return [<ListSubheader>Public Scheme</ListSubheader>, ...publicOptions];
-  // };
-
-  // const useOptions = (data: string[]) => {
-  //   const options = data.map((option: string, key: number) => {
-  //     return (
-  //       <MenuItem key={key} value={option}>
-  //         <Link to={`${urlParam}${option}`}>{option}</Link>
-  //       </MenuItem>
-  //     );
-  //   });
-  //   return [...options];
-  // };
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -148,9 +112,6 @@ export default function Selector({ data, label, urlParam, param }: DataProps) {
           label={label}
           onChange={handleChange}
         >
-          {/* {label === "Schemes" && renderCentralOptions(data as SchemeType[])}
-          {label === "Schemes" && renderPublicOptions(data as SchemeType[])}
-          {label !== "Schemes" && renderOptions(data as string[], urlParam as string)} */}
           {useOptions(label, data as string[], urlParam)}
         </Select>
       </FormControl>
