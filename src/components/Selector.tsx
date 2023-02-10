@@ -36,7 +36,7 @@ const UpdateParam = (option: SchemeType) => {
 const useOptions = (
   label: string | undefined,
   data: string[] | SchemeType[],
-  urlParam: string,
+  urlParam: string
 ) => {
   if (label !== "Schemes") {
     const options = (data as string[]).map((option: string, key: number) => {
@@ -50,26 +50,40 @@ const useOptions = (
   } else {
     const options = (data as SchemeType[]).map(
       (option: SchemeType, key: number) => {
-
         //toggle between public or central param
         const { param } = UpdateParam(option);
 
         return (
-         <MenuItem key={key} value={Object.values(option)[0]}>
-            <Link
-              to={`${urlParam}${param}/${Object.values(option)}`}
-            >
+          <MenuItem
+            key={Object.keys(option)[0]}
+            value={Object.values(option)[0]}
+          >
+            <Link to={`${urlParam}${param}/${Object.values(option)}`}>
               {Object.values(option)}
             </Link>
           </MenuItem>
         );
       }
     );
-    return [<ListSubheader>Central Schemes</ListSubheader>, ...options];
+
+    //add Central or Public subheader
+    const centralOptions = options.filter(
+      (option: JSX.Element) => option.key === "central"
+    );
+    const publicOptions = options.filter(
+      (option: JSX.Element) => option.key === "public"
+    );
+    console.log(publicOptions);
+    return [
+      <ListSubheader>Central Schemes</ListSubheader>,
+      ...centralOptions,
+      <ListSubheader>Public Schemes</ListSubheader>,
+      ...publicOptions,
+    ];
   }
 };
 
-export default function Selector({ data, label, urlParam, param}: DataProps) {
+export default function Selector({ data, label, urlParam, param }: DataProps) {
   const [value, setValue] = useState<string | undefined>("");
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -77,7 +91,6 @@ export default function Selector({ data, label, urlParam, param}: DataProps) {
     setValue(event.target.value);
   };
 
-  
   //update selector on url param change
   React.useEffect(() => {
     setValue(param);
